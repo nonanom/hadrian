@@ -1,4 +1,4 @@
-name: ETL Job Workflow
+name: Run ETL job on the EC2 instance
 
 on:
   workflow_dispatch:
