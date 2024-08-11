@@ -59,19 +59,14 @@ resource "aws_instance" "web" {
               apt-get install -y docker.io docker-compose
 
               echo "Configuring SSH"
-              sed -i 's/^#\?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config
-              sed -i 's/^#\?PermitRootLogin .*/PermitRootLogin no/' /etc/ssh/sshd_config
-              sed -i 's/^#\?PubkeyAuthentication .*/PubkeyAuthentication no/' /etc/ssh/sshd_config
-              echo "LogLevel DEBUG" >> /etc/ssh/sshd_config
+              sed 's/PasswordAuthentication no/PasswordAuthentication yes/' -i /etc/ssh/sshd_config
+              systemctl restart sshd
+              service sshd restart
 
               echo "Creating user"
               useradd -m -s /bin/bash ${var.EC2_USERNAME}
-              echo "${var.EC2_USERNAME}:${var.EC2_PASSWORD}" | chpasswd
+              echo "${var.EC2_PASSWORD}" | passwd --stdin ${var.EC2_USERNAME}
               usermod -aG sudo ${var.EC2_USERNAME}
-
-              echo "Restarting SSH service"
-              systemctl restart ssh
-              systemctl status ssh
 
               echo "Starting Docker"
               systemctl start docker
@@ -89,6 +84,7 @@ resource "aws_instance" "web" {
 
   depends_on = [aws_s3_bucket.ml_data_bucket]
 }
+
 
 # Create a CloudWatch log group for the EC2 instance logs
 resource "aws_cloudwatch_log_group" "ec2_log_group" {
