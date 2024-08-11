@@ -31,12 +31,15 @@ jobs:
 
       - name: Terraform Init
         run: |
+          cd terraform/aws
           terraform init -backend-config="bucket=$bucket_name"
 
       - name: Terraform Refresh
         run: |
+          cd terraform/aws
           terraform refresh
 
       - name: Terraform Destroy
         run: |
+          cd terraform/aws
           terraform destroy -auto-approve=true || true
