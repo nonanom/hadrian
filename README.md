@@ -29,7 +29,7 @@ This repository helps you build a scalable and secure data platform on AWS to su
 
 3. **Run ETL Job**:
    - **Workflow File**: `run-etl-job-on-the-ec2-instance.yml`
-   - **What It Does**: Runs an ETL job on the EC2 instance. The workflow first securely connects to the EC2 instance via SSH, then copies the `etl-job.py` script to the instance using SCP. Once the script is on the instance, the workflow executes it there. The job downloads data from S3, processes it according to the script provided, and uploads the transformed data to the RDS.
+   - **What It Does**: Runs an ETL job on the EC2 instance. The workflow securely connects to the EC2 instance, copies the etl-job.py script via SCP, and runs it directly on the instance. The script downloads data from S3, processes it, and uploads the results to the RDS database.
    - **How to Use**:
      1. Edit `etl-job.py` in the `scripts/` directory to define your data processing steps.
      2. Trigger this workflow manually via GitHub Actions. The workflow will copy the Python script to the EC2 instance, run it, and handle the data processing tasks.
