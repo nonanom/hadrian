@@ -49,7 +49,7 @@ resource "aws_instance" "web" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t3.micro"
   security_groups        = [aws_security_group.ec2_sg.name]
-  associate_public_ip_address = true  # Add this line
+  associate_public_ip_address = true
 
   user_data = <<-EOF
               #!/bin/bash
