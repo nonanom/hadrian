@@ -44,11 +44,18 @@ resource "aws_security_group" "ec2_sg" {
   }
 }
 
-# Create the EC2 instance with the latest Ubuntu AMI and password authentication
+# Create an SSH key pair
+resource "aws_key_pair" "project_key" {
+  key_name   = "${var.PROJECT_NAME}-ssh-public-key"
+  public_key = var.EC2_PUBLIC_KEY
+}
+
+# Create the EC2 instance with the latest Ubuntu AMI and SSH key authentication
 resource "aws_instance" "web" {
   ami             = data.aws_ami.ubuntu.id
   instance_type   = "t3.micro"
   security_groups = [aws_security_group.ec2_sg.name]
+  key_name        = aws_key_pair.project_key.key_name
 
   user_data = <<-EOF
               #!/bin/bash
@@ -57,16 +64,6 @@ resource "aws_instance" "web" {
 
               apt-get update -y
               apt-get install -y docker.io docker-compose
-
-              echo "Configuring SSH"
-              sed 's/PasswordAuthentication no/PasswordAuthentication yes/' -i /etc/ssh/sshd_config
-              systemctl restart sshd
-              service sshd restart
-
-              echo "Creating user"
-              useradd -m -s /bin/bash ${var.EC2_USERNAME}
-              echo "${var.EC2_USERNAME}:${var.EC2_PASSWORD}" | chpasswd
-              usermod -aG sudo ${var.EC2_USERNAME}
 
               echo "Starting Docker"
               systemctl start docker
@@ -84,7 +81,6 @@ resource "aws_instance" "web" {
 
   depends_on = [aws_s3_bucket.ml_data_bucket]
 }
-
 
 # Create a CloudWatch log group for the EC2 instance logs
 resource "aws_cloudwatch_log_group" "ec2_log_group" {
@@ -130,15 +126,8 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   role = aws_iam_role.ec2_cloudwatch_agent_role.name
 }
 
-
-variable "EC2_USERNAME" {
-  description = "EC2 username"
-  type        = string
-  sensitive   = true
-}
-
-variable "EC2_PASSWORD" {
-  description = "EC2 password"
+variable "EC2_PUBLIC_KEY" {
+  description = "EC2 public key"
   type        = string
   sensitive   = true
 }
@@ -150,5 +139,5 @@ output "ec2_instance_public_ip" {
 
 output "ssh_connection_string" {
   description = "SSH connection string to connect to the EC2 instance"
-  value       = "ssh <EC2_USERNAME>@${aws_instance.web.public_ip}"
+  value       = "ssh -i <path_to_private_key> ubuntu@${aws_instance.web.public_ip}"
 }
