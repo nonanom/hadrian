@@ -58,7 +58,6 @@ resource "aws_db_instance" "default" {
 variable "DB_USERNAME" {
   description = "DB username"
   type        = string
-  sensitive   = true
 }
 
 variable "DB_PASSWORD" {

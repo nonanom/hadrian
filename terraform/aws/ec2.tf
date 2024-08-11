@@ -199,7 +199,6 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 variable "EC2_PUBLIC_KEY" {
   description = "EC2 public key"
   type        = string
-  sensitive   = true
 }
 
 output "ec2_instance_public_ip" {
