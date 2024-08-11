@@ -1,4 +1,4 @@
-name: Setup all the AWS infrastructure
+name: Create all the AWS infrastructure
 
 on:
   workflow_dispatch:
