@@ -59,7 +59,7 @@ The Terraform configuration in this repository builds a complete AWS platform:
 
 ### S3 Bucket
 
-- **Name**: `<your-name>-hadrian-ml-data-bucket`
+- **Name**: `<PROJECT_NAME>-hadrian-ml-data-bucket`
 - **Versioning**: Enabled to keep track of object versions.
 
 ## Setting Up GitHub Secrets and Variables
