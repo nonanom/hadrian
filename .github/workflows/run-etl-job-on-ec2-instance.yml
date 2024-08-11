@@ -1,0 +1,41 @@
+name: ETL Job Workflow
+
+on:
+  workflow_dispatch:
+
+env:
+  AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  TF_VAR_PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+  RDS_ENDPOINT: ${{ secrets.RDS_ENDPOINT }}
+  DB_USERNAME: ${{ secrets.DB_USERNAME }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+  EC2_HOST: ${{ vars.EC2_HOST }}
+
+jobs:
+  run-etl-job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Deploy and run ETL job
+      env:
+
+      run: |
+        echo "$EC2_PRIVATE_KEY" > id_rsa
+        chmod 600 id_rsa
+        scp -o StrictHostKeyChecking=no -i id_rsa etl_job.py ubuntu@${EC2_HOST}:~/etl_job.py
+        ssh -o StrictHostKeyChecking=no -i id_rsa ubuntu@${EC2_HOST} '
+          export AWS_DEFAULT_REGION=${{ env.AWS_DEFAULT_REGION }}
+          export AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}
+          export TF_VAR_PROJECT_NAME=${{ env.TF_VAR_PROJECT_NAME }}
+          export RDS_ENDPOINT=${{ env.RDS_ENDPOINT }}
+          export DB_USERNAME=${{ env.DB_USERNAME }}
+          export DB_PASSWORD=${{ env.DB_PASSWORD }}
+          python3 ~/etl_job.py
+        '
+        rm id_rsa
