@@ -46,9 +46,9 @@ resource "aws_security_group" "ec2_sg" {
 
 # Create the EC2 instance with the latest Ubuntu AMI
 resource "aws_instance" "web" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"  # Cheapest instance type
-  key_name      = "your_key_name"  # Replace with your actual key pair name
+  ami             = data.aws_ami.ubuntu.id
+  instance_type   = "t3.micro"  # Cheapest instance type
+  key_name        = "your_key_name"  # Replace with your actual key pair name
   security_groups = [aws_security_group.ec2_sg.name]
 
   user_data = <<-EOF
@@ -63,9 +63,8 @@ resource "aws_instance" "web" {
     Name = "${var.PROJECT_NAME} EC2 Instance"
   }
 
-  monitoring = true  # Enable CloudWatch monitoring
-
-  iam_instance_profile = aws_instance_profile.ec2_instance_profile.name
+  monitoring          = true  # Enable CloudWatch monitoring
+  iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
 
   depends_on = [aws_s3_bucket.ml_data_bucket]
 }
