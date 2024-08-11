@@ -65,7 +65,7 @@ resource "aws_instance" "web" {
 
               echo "Creating user"
               useradd -m -s /bin/bash ${var.EC2_USERNAME}
-              echo "${var.EC2_PASSWORD}" | passwd --stdin ${var.EC2_USERNAME}
+              echo "${var.EC2_USERNAME}:${var.EC2_PASSWORD}" | chpasswd
               usermod -aG sudo ${var.EC2_USERNAME}
 
               echo "Starting Docker"
