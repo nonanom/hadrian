@@ -1,4 +1,4 @@
-name: Upload data.csv to the S3 bucket
+name: Ingest | Upload data.csv to the S3 bucket
 
 on:
   workflow_dispatch:

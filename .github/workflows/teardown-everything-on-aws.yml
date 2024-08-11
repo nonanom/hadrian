@@ -1,4 +1,4 @@
-name: Teardown everything on AWS
+name: AWS | Teardown everything on AWS
 
 on:
   workflow_dispatch:
