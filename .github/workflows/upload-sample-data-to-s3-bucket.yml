@@ -1,4 +1,4 @@
-name: Upload sample data to S3 bucket
+name: Upload data to S3 bucket
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ env:
   TF_VAR_PROJECT_NAME: ${{ vars.PROJECT_NAME }}
 
 jobs:
-  upload-to-s3:
+  upload-data-to-s3:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
