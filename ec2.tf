@@ -109,7 +109,7 @@ resource "aws_iam_role_policy_attachment" "ec2_cloudwatch_logs" {
 }
 
 # Create an instance profile to associate the IAM role with the EC2 instance
-resource "aws_instance_profile" "ec2_instance_profile" {
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "${var.PROJECT_NAME}-ec2-instance-profile"
   role = aws_iam_role.ec2_cloudwatch_agent_role.name
 }
