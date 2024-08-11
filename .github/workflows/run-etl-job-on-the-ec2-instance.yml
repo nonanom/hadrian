@@ -15,15 +15,13 @@ env:
   EC2_HOST: ${{ vars.EC2_HOST }}
 
 jobs:
-  run-etl-job:
+  job:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
     - name: Deploy and run ETL job
-      env:
-
       run: |
         echo "$EC2_PRIVATE_KEY" > id_rsa
         chmod 600 id_rsa
