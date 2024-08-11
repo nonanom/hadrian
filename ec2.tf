@@ -134,11 +134,13 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 variable "EC2_USERNAME" {
   description = "EC2 username"
   type        = string
+  sensitive   = true
 }
 
 variable "EC2_PASSWORD" {
   description = "EC2 password"
   type        = string
+  sensitive   = true
 }
 
 output "ec2_instance_public_ip" {
