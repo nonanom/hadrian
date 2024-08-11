@@ -142,5 +142,5 @@ output "ec2_instance_public_ip" {
 
 output "ssh_connection_string" {
   description = "SSH connection string to connect to the EC2 instance"
-  value       = "ssh ${var.EC2_USERNAME}@${aws_instance.web.public_ip}"
+  value       = "ssh <EC2_USERNAME>@${aws_instance.web.public_ip}"
 }
