@@ -32,7 +32,7 @@ jobs:
 
     - name: Install dependencies on EC2 instance
       run: |
-        ssh -v -o StrictHostKeyChecking=no -i id_rsa ubuntu@${EC2_PUBLIC_DNS} '
+        ssh -o StrictHostKeyChecking=no -i id_rsa ubuntu@${EC2_PUBLIC_DNS} '
           sudo apt-get update && sudo apt-get install -y python3-pip libpq-dev
           pip3 install boto3 psycopg2-binary
         '
