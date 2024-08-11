@@ -85,7 +85,7 @@ resource "aws_instance" "web" {
                   },
                   "metrics": {
                       "append_dimensions": {
-                          "InstanceId": "\${aws:InstanceId}"
+                          "InstanceId": "$${aws:InstanceId}"
                       },
                       "metrics_collected": {
                           "cpu": {
@@ -139,7 +139,8 @@ resource "aws_instance" "web" {
               /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json
 
               echo "User data script completed"
-              EOF
+  EOF
+
 
   tags = {
     Name = "${var.PROJECT_NAME} EC2 Instance"
