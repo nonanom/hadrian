@@ -44,18 +44,11 @@ resource "aws_security_group" "ec2_sg" {
   }
 }
 
-# Create an SSH key pair
-resource "aws_key_pair" "project_key" {
-  key_name   = "${var.PROJECT_NAME}-ssh-public-key"
-  public_key = var.EC2_PUBLIC_KEY
-}
-
 # Create the EC2 instance with the latest Ubuntu AMI and SSH key authentication
 resource "aws_instance" "web" {
   ami             = data.aws_ami.ubuntu.id
   instance_type   = "t3.micro"
   security_groups = [aws_security_group.ec2_sg.name]
-  key_name        = aws_key_pair.project_key.key_name
 
   user_data = <<-EOF
               #!/bin/bash
@@ -64,6 +57,13 @@ resource "aws_instance" "web" {
 
               apt-get update -y
               apt-get install -y docker.io docker-compose
+
+              echo "Setting up SSH key"
+              mkdir -p /home/ubuntu/.ssh
+              echo "${var.EC2_PUBLIC_KEY}" >> /home/ubuntu/.ssh/authorized_keys
+              chown -R ubuntu:ubuntu /home/ubuntu/.ssh
+              chmod 700 /home/ubuntu/.ssh
+              chmod 600 /home/ubuntu/.ssh/authorized_keys
 
               echo "Starting Docker"
               systemctl start docker
@@ -139,5 +139,5 @@ output "ec2_instance_public_ip" {
 
 output "ssh_connection_string" {
   description = "SSH connection string to connect to the EC2 instance"
-  value       = "ssh -i <path_to_private_key> ubuntu@${aws_instance.web.public_ip}"
+  value       = "ssh -i ~/.ssh/id_rsa ubuntu@${aws_instance.web.public_ip}"
 }
