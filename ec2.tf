@@ -22,14 +22,14 @@ resource "aws_security_group" "ec2_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["104.28.85.109/32"]  # mikevincent’s home IP
+    cidr_blocks = ["104.28.85.109/32"]  # mikevincent's home IP
   }
 
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["104.28.85.109/32"]  # mikevincent’s home IP
+    cidr_blocks = ["104.28.85.109/32"]  # mikevincent's home IP
   }
 
   egress {
@@ -44,17 +44,28 @@ resource "aws_security_group" "ec2_sg" {
   }
 }
 
-# Create the EC2 instance with the latest Ubuntu AMI
+# Create the EC2 instance with the latest Ubuntu AMI and password authentication
 resource "aws_instance" "web" {
   ami             = data.aws_ami.ubuntu.id
-  instance_type   = "t3.micro"  # Cheapest instance type
-  key_name        = "your_key_name"  # Replace with your actual key pair name
+  instance_type   = "t3.micro"
   security_groups = [aws_security_group.ec2_sg.name]
 
   user_data = <<-EOF
               #!/bin/bash
               apt-get update -y
               apt-get install -y docker.io docker-compose
+
+              # Set up password authentication
+              sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+              systemctl restart sshd
+
+              # Create user and set password
+              useradd -m -s /bin/bash ${var.EC2_USERNAME}
+              echo "${var.EC2_USERNAME}:${var.EC2_PASSWORD}" | chpasswd
+
+              # Add user to sudo group
+              usermod -aG sudo ${var.EC2_USERNAME}
+
               systemctl start docker
               systemctl enable docker
             EOF
@@ -63,7 +74,7 @@ resource "aws_instance" "web" {
     Name = "${var.PROJECT_NAME} EC2 Instance"
   }
 
-  monitoring          = true  # Enable CloudWatch monitoring
+  monitoring           = true
   iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
 
   depends_on = [aws_s3_bucket.ml_data_bucket]
@@ -111,4 +122,15 @@ resource "aws_iam_role_policy_attachment" "ec2_cloudwatch_logs" {
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "${var.PROJECT_NAME}-ec2-instance-profile"
   role = aws_iam_role.ec2_cloudwatch_agent_role.name
+}
+
+
+variable "EC2_USERNAME" {
+  description = "EC2 username"
+  type        = string
+}
+
+variable "EC2_PASSWORD" {
+  description = "EC2 password"
+  type        = string
 }
