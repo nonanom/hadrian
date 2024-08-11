@@ -27,4 +27,4 @@ jobs:
         pip install boto3
 
     - name: Run data ingestion script
-      run: python data-ingestion.py
+      run: python scripts/data-ingestion.py

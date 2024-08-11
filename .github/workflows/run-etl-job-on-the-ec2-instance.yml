@@ -28,7 +28,7 @@ jobs:
 
     - name: Copy ETL job to EC2 instance
       run: |
-        scp -v -o StrictHostKeyChecking=no -i id_rsa etl-job.py ubuntu@${EC2_PUBLIC_DNS}:~/etl_job.py
+        scp -v -o StrictHostKeyChecking=no -i id_rsa scripts/etl-job.py ubuntu@${EC2_PUBLIC_DNS}:~/etl_job.py
 
     - name: Install dependencies on EC2 instance
       run: |
