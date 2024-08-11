@@ -134,3 +134,13 @@ variable "EC2_PASSWORD" {
   description = "EC2 password"
   type        = string
 }
+
+output "ec2_instance_public_ip" {
+  description = "Public IP address of the EC2 instance"
+  value       = aws_instance.web.public_ip
+}
+
+output "ssh_connection_string" {
+  description = "SSH connection string to connect to the EC2 instance"
+  value       = "ssh ${var.EC2_USERNAME}@${aws_instance.web.public_ip}"
+}
