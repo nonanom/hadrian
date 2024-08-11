@@ -46,9 +46,10 @@ resource "aws_security_group" "ec2_sg" {
 
 # Create the EC2 instance with the latest Ubuntu AMI and SSH key authentication
 resource "aws_instance" "web" {
-  ami             = data.aws_ami.ubuntu.id
-  instance_type   = "t3.micro"
-  security_groups = [aws_security_group.ec2_sg.name]
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = "t3.micro"
+  security_groups        = [aws_security_group.ec2_sg.name]
+  associate_public_ip_address = true  # Add this line
 
   user_data = <<-EOF
               #!/bin/bash
@@ -58,7 +59,7 @@ resource "aws_instance" "web" {
               apt-get update -y
               apt-get install -y docker.io docker-compose
 
-              echo "Setting up SSH key"
+              echo "Setting up SSH key for ubuntu user"
               mkdir -p /home/ubuntu/.ssh
               echo "${var.EC2_PUBLIC_KEY}" >> /home/ubuntu/.ssh/authorized_keys
               chown -R ubuntu:ubuntu /home/ubuntu/.ssh
@@ -137,7 +138,17 @@ output "ec2_instance_public_ip" {
   value       = aws_instance.web.public_ip
 }
 
-output "ssh_connection_string" {
-  description = "SSH connection string to connect to the EC2 instance"
+output "ec2_instance_public_dns" {
+  description = "Public DNS name of the EC2 instance"
+  value       = aws_instance.web.public_dns
+}
+
+output "ssh_connection_string_ip" {
+  description = "SSH connection string using IP address"
   value       = "ssh -i ~/.ssh/id_rsa ubuntu@${aws_instance.web.public_ip}"
+}
+
+output "ssh_connection_string_dns" {
+  description = "SSH connection string using public DNS name"
+  value       = "ssh -i ~/.ssh/id_rsa ubuntu@${aws_instance.web.public_dns}"
 }
