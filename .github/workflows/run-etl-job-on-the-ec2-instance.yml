@@ -28,7 +28,7 @@ jobs:
 
     - name: Copy ETL job to EC2 instance
       run: |
-        scp -v -o StrictHostKeyChecking=no -i id_rsa scripts/etl-job.py ubuntu@${EC2_PUBLIC_DNS}:~/etl_job.py
+        scp -o StrictHostKeyChecking=no -i id_rsa scripts/etl-job.py ubuntu@${EC2_PUBLIC_DNS}:~/etl_job.py
 
     - name: Install dependencies on EC2 instance
       run: |
@@ -39,7 +39,7 @@ jobs:
 
     - name: Run ETL job on EC2 instance
       run: |
-        ssh -v -o StrictHostKeyChecking=no -i id_rsa ubuntu@${EC2_PUBLIC_DNS} '
+        ssh -o StrictHostKeyChecking=no -i id_rsa ubuntu@${EC2_PUBLIC_DNS} '
           export AWS_DEFAULT_REGION=${{ env.AWS_DEFAULT_REGION }}
           export AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}
           export AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}
