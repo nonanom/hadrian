@@ -17,26 +17,29 @@ env:
 jobs:
   job:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Transfer ETL script to EC2 instance
+    - name: Prepare SSH key
       run: |
-        echo "$EC2_PRIVATE_KEY" | ssh -o StrictHostKeyChecking=no -i /dev/stdin ubuntu@${EC2_PUBLIC_DNS} "cat > /tmp/id_rsa && chmod 600 /tmp/id_rsa"
-        scp -i /tmp/id_rsa -o StrictHostKeyChecking=no scripts/etl-job.py ubuntu@${EC2_PUBLIC_DNS}:~/etl_job.py
+        echo "$EC2_PRIVATE_KEY" > id_rsa
+        chmod 600 id_rsa
+
+    - name: Copy ETL job to EC2 instance
+      run: |
+        scp -o StrictHostKeyChecking=no -i id_rsa scripts/etl-job.py ubuntu@${EC2_PUBLIC_DNS}:~/etl_job.py
 
     - name: Install dependencies on EC2 instance
       run: |
-        echo "$EC2_PRIVATE_KEY" | ssh -o StrictHostKeyChecking=no -i /dev/stdin ubuntu@${EC2_PUBLIC_DNS} '
+        ssh -o StrictHostKeyChecking=no -i id_rsa ubuntu@${EC2_PUBLIC_DNS} '
           sudo apt-get update && sudo apt-get install -y python3-pip libpq-dev
           pip3 install boto3 psycopg2-binary
         '
 
-    - name: Execute ETL job on EC2 instance
+    - name: Run ETL job on EC2 instance
       run: |
-        echo "$EC2_PRIVATE_KEY" | ssh -o StrictHostKeyChecking=no -i /dev/stdin ubuntu@${EC2_PUBLIC_DNS} '
+        ssh -o StrictHostKeyChecking=no -i id_rsa ubuntu@${EC2_PUBLIC_DNS} '
           export AWS_DEFAULT_REGION=${{ env.AWS_DEFAULT_REGION }}
           export AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}
           export AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}
@@ -47,6 +50,6 @@ jobs:
           python3 ~/etl_job.py
         '
 
-    - name: Clean up temporary SSH key on EC2
+    - name: Cleanup SSH key
       run: |
-        echo "$EC2_PRIVATE_KEY" | ssh -o StrictHostKeyChecking=no -i /dev/stdin ubuntu@${EC2_PUBLIC_DNS} 'rm /tmp/id_rsa'
+        rm id_rsa
