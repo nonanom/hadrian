@@ -29,7 +29,7 @@ This repository helps you build a scalable and secure data platform on AWS to su
 
 3. **Run ETL Job**:
    - **Workflow File**: `run-etl-job-on-the-ec2-instance.yml`
-   - **What It Does**: Runs an ETL job on the EC2 instance. The job downloads data from S3, processes it according to the script you provide, and uploads the transformed data to the RDS.
+   - **What It Does**: Runs an ETL job on the EC2 instance. The job downloads data from S3, processes it according to the script provided, and uploads the transformed data to the RDS.
    - **How to Use**:
      1. Edit `etl-job.py` in the `scripts/` directory to define your data processing steps.
      2. Trigger this workflow manually via GitHub Actions.
@@ -48,7 +48,7 @@ The Terraform configuration in this repository builds a complete AWS platform:
 
 - **OS**: Latest Ubuntu 20.04
 - **Instance Type**: `t3.micro`
-- **Security**: Configured to allow SSH (port 22) and HTTP (port 80) access.
+- **Security**: Configured to allow SSH (port 22) and HTTP (powrt 80) access.
 - **User Data**: Installs Docker, sets up SSH, and configures CloudWatch logging.
 
 ### RDS (PostgreSQL)
