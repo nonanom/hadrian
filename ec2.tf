@@ -52,23 +52,33 @@ resource "aws_instance" "web" {
 
   user_data = <<-EOF
               #!/bin/bash
+              exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+              echo "Starting user data script execution"
+
               apt-get update -y
               apt-get install -y docker.io docker-compose
 
-              # Set up password authentication
-              sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
-              systemctl restart sshd
+              echo "Configuring SSH"
+              sed -i 's/^#\?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+              sed -i 's/^#\?PermitRootLogin .*/PermitRootLogin no/' /etc/ssh/sshd_config
+              sed -i 's/^#\?PubkeyAuthentication .*/PubkeyAuthentication no/' /etc/ssh/sshd_config
+              echo "LogLevel DEBUG" >> /etc/ssh/sshd_config
 
-              # Create user and set password
+              echo "Creating user"
               useradd -m -s /bin/bash ${var.EC2_USERNAME}
               echo "${var.EC2_USERNAME}:${var.EC2_PASSWORD}" | chpasswd
-
-              # Add user to sudo group
               usermod -aG sudo ${var.EC2_USERNAME}
 
+              echo "Restarting SSH service"
+              systemctl restart ssh
+              systemctl status ssh
+
+              echo "Starting Docker"
               systemctl start docker
               systemctl enable docker
-            EOF
+
+              echo "User data script completed"
+              EOF
 
   tags = {
     Name = "${var.PROJECT_NAME} EC2 Instance"
