@@ -22,14 +22,14 @@ resource "aws_security_group" "ec2_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["107.197.174.39/32"]  # mikevincent's home IP
+    cidr_blocks = ["0.0.0.0/0"] 
   }
 
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["107.197.174.39/32"]  # mikevincent's home IP
+    cidr_blocks = ["0.0.0.0/0"] 
   }
 
   egress {
@@ -43,6 +43,7 @@ resource "aws_security_group" "ec2_sg" {
     Name = "${var.PROJECT_NAME} EC2 Security Group"
   }
 }
+
 
 # Create the EC2 instance with the latest Ubuntu AMI and SSH key authentication
 resource "aws_instance" "web" {
