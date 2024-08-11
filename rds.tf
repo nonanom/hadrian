@@ -26,9 +26,9 @@ resource "aws_security_group" "rds_sg" {
 resource "aws_db_instance" "default" {
   identifier        = "${var.PROJECT_NAME}-db"
   engine            = "postgres"
-  engine_version    = "13"  # Using a stable, but not the latest version
-  instance_class    = "db.t3.micro"  # Cheapest instance class
-  allocated_storage = 20  # Minimum storage in GB
+  engine_version    = "13"
+  instance_class    = "db.t3.micro"
+  allocated_storage = 20
 
   db_name  = "mydb"
   username = var.DB_USERNAME
@@ -36,25 +36,18 @@ resource "aws_db_instance" "default" {
 
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
 
-  # Disable features to reduce costs
-  backup_retention_period = 0
+  backup_retention_period = 1
+  backup_window           = "03:00-03:30"
+
   skip_final_snapshot     = true
   multi_az                = false
   publicly_accessible     = false
 
-  # Disable performance insights
   performance_insights_enabled = false
+  storage_encrypted           = false
 
-  # Disable encryption (Note: not recommended for real-world scenarios)
-  storage_encrypted = false
+  maintenance_window = "Sun:04:00-Sun:04:30"
 
-  # Disable automated backups
-  backup_window = "00:00-00:00"
-
-  # Disable maintenance window
-  maintenance_window = "Sun:00:00-Sun:00:00"
-
-  # Disable deletion protection for easy cleanup
   deletion_protection = false
 
   tags = {
