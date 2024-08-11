@@ -1,29 +1,16 @@
 import os
 import sys
 import boto3
-from botocore.exceptions import ClientError
-
-def check_file_exists(bucket, object_name):
-    """Check if a file exists in an S3 bucket"""
-    s3_client = boto3.client('s3')
-    try:
-        s3_client.head_object(Bucket=bucket, Key=object_name)
-    except ClientError as e:
-        if e.response['Error']['Code'] == "404":
-            return False
-        else:
-            raise
-    return True
 
 def upload_to_s3(file_name, bucket, object_name):
     """Upload a file to an S3 bucket"""
     s3_client = boto3.client('s3')
     try:
         s3_client.upload_file(file_name, bucket, object_name)
+        return True
     except Exception as e:
         print(f"Error uploading file to S3: {e}")
         return False
-    return True
 
 def main():
     # Get environment variables
@@ -43,12 +30,6 @@ def main():
     if not os.path.exists(csv_file):
         print(f"Error: {csv_file} not found in the current directory")
         sys.exit(1)
-
-    # Check if file already exists in S3
-    if check_file_exists(bucket_name, object_name):
-        print(f"File {object_name} already exists in bucket {bucket_name}")
-        print("Upload cancelled.")
-        sys.exit(0)
 
     # Upload the CSV file
     upload_success = upload_to_s3(csv_file, bucket_name, object_name)
