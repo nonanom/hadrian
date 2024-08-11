@@ -28,8 +28,14 @@ jobs:
 
     - name: Copy ETL job to EC2 instance
       run: |
-        ls -la
         scp -v -o StrictHostKeyChecking=no -i id_rsa etl-job.py ubuntu@${EC2_PUBLIC_DNS}:~/etl_job.py
+
+    - name: Install dependencies on EC2 instance
+      run: |
+        ssh -v -o StrictHostKeyChecking=no -i id_rsa ubuntu@${EC2_PUBLIC_DNS} '
+          sudo apt-get update && sudo apt-get install -y python3-pip
+          pip3 install boto3 psycopg2
+        '
 
     - name: Run ETL job on EC2 instance
       run: |
