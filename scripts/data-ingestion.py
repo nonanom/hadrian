@@ -23,7 +23,7 @@ def main():
     bucket_name = f"{project_name}-hadrian-ml-data-bucket"
 
     # CSV file path and S3 object name
-    csv_file = '../data/data.csv'
+    csv_file = 'data/data.csv'
     object_name = 'data.csv'  # Same name in S3
 
     # Check if the CSV file exists locally
