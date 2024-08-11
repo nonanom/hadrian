@@ -28,6 +28,7 @@ jobs:
 
     - name: Copy ETL job to EC2 instance
       run: |
+        ls -la
         scp -v -o StrictHostKeyChecking=no -i id_rsa etl_job.py ubuntu@${EC2_PUBLIC_DNS}:~/etl_job.py
 
     - name: Run ETL job on EC2 instance
